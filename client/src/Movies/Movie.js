@@ -33,6 +33,14 @@ function Movie({ addToSavedList }) {
       <div className="save-button" onClick={saveMovie}>
         Save
       </div>
+      <div>
+        <button
+          onClick={(props) => props.history.push(`/update-movie/${movie.id}`)}
+        >
+          Edit
+        </button>
+        <button onClick={deleteMovie}>Delete</button>
+      </div>
     </div>
   );
 }
