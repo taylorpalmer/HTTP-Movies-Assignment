@@ -1,11 +1,24 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useParams } from "react-router-dom";
 import MovieCard from "./MovieCard";
 
-function Movie({ addToSavedList }) {
+function Movie(props) {
   const [movie, setMovie] = useState(null);
-  const params = useParams();
+  console.log(props);
+
+  const deleteMovie = (event) => {
+    event.preventDefault();
+
+    axios
+      .delete(`http://localhost:5000/api/movies/${props.match.params.id}`)
+      .then((res) => {
+        console.log("delete res: ", res);
+        props.updateMovies((state) =>
+          state.filter((movie) => movie.id != props.match.params.id)
+        );
+        props.history.push(`/`);
+      });
+  };
 
   const fetchMovie = (id) => {
     axios
@@ -15,12 +28,12 @@ function Movie({ addToSavedList }) {
   };
 
   const saveMovie = () => {
-    addToSavedList(movie);
+    props.addToSavedList(movie);
   };
 
   useEffect(() => {
-    fetchMovie(params.id);
-  }, [params.id]);
+    fetchMovie(props.match.params.id);
+  }, [props.match.params.id]);
 
   if (!movie) {
     return <div>Loading movie information...</div>;
@@ -34,9 +47,7 @@ function Movie({ addToSavedList }) {
         Save
       </div>
       <div>
-        <button
-          onClick={(props) => props.history.push(`/update-movie/${movie.id}`)}
-        >
+        <button onClick={() => props.history.push(`/update-movie/${movie.id}`)}>
           Edit
         </button>
         <button onClick={deleteMovie}>Delete</button>

@@ -12,16 +12,15 @@ const UpdateForm = (props) => {
   const [movie, setMovie] = useState(initialMovie);
 
   useEffect(() => {
-    const movieToUpdate = props.movies.find((movie) => {
-      return `${movie.id}` === props.match.params.id;
-    });
-
-    console.log("movieToUpdate: ", movieToUpdate);
-
-    if (movieToUpdate) {
-      setMovie(movieToUpdate);
-    }
-  }, [props.movies, props.match.params.id]);
+    axios
+      .get(`http://localhost:5000/api/movies/${props.match.params.id}`)
+      .then((res) => {
+        setMovie(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, [props.match.params.id]);
 
   const changeHandler = (event) => {
     event.persist();
@@ -33,11 +32,19 @@ const UpdateForm = (props) => {
     event.preventDefault();
 
     axios
-      .put(``, movie)
+      .put(`http://localhost:5000/api/movies/${movie.id}`, movie)
       .then((res) => {
         console.log("res: ", res);
-        props.updateMovie(res.data);
-        props.history.push(``);
+        props.updateMovies((state) =>
+          state.map((movie) => {
+            if (movie.id === movie.id) {
+              return res.data;
+            } else {
+              return movie;
+            }
+          })
+        );
+        props.history.push(`/`);
       })
       .catch((err) => console.log("Error is: ", err));
   };
